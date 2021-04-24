@@ -1,6 +1,5 @@
 <template>
     <div class="home flex justify-center flex-col items-center h-screen">
-        <input type="text" style="background: black; color: white" />
         <div
             :key="player.id"
             v-for="player in players"
