@@ -3,18 +3,12 @@
         <div
             :key="player.id"
             v-for="player in players"
-            @click="changePlayer"
-            :class="['player-' + player.id.toString(), activePlayer === player.id && 'active']"
+            @click="changePlayer(player.id)"
+            :class="['player-' + player.id.toString(), activePlayerId === player.id && 'active']"
         >
-            <Clock
-                @game-over="handleGameOver"
-                :running="running && activePlayer === player.id"
-                :duration="10"
-                :name="player.name"
-            />
+            <Clock :name="player.name" :text="player.text" />
         </div>
         <br />
-        <button @click="start" v-if="!running">Start</button>
     </div>
 </template>
 
@@ -28,38 +22,83 @@ export default {
         Clock,
     },
     methods: {
-        start: function () {
-            this.running = true
-            this.started = true
-        },
-        changePlayer: function () {
-            console.log(this.started)
-            if (this.running || !this.started)
-                this.activePlayer === 1 ? (this.activePlayer = 2) : (this.activePlayer = 1)
-            console.log("CHANGED")
-        },
-        updateClock: function () {
-            if (!this.started) {
-                this.started = true
-            } else {
-                this.activePlayer === 1 ? (this.activePlayer = 2) : (this.activePlayer = 1)
+        updateCounter: function (player) {
+            let timer = player.left,
+                minutes,
+                seconds
+            if (this.interval) clearInterval(this.interval)
+            console.log(timer)
+            const foo = () => {
+                minutes = parseInt(timer / 60, 10)
+                seconds = parseInt(timer % 60, 10)
+
+                minutes = minutes < 10 ? "0" + minutes : minutes
+                seconds = seconds < 10 ? "0" + seconds : seconds
+
+                player.text = minutes + ":" + seconds
+                player.left = --timer
+
+                if (timer < 0) {
+                    player.text = "Game Over"
+                    this.gameOver = true
+                    this.running = false
+                }
             }
+            foo()
+            this.interval = setInterval(function () {
+                foo()
+            }, 1000)
         },
-        handleGameOver: function () {
-            console.log("GAME IS OVER!!")
-            this.running = false
+        parseTime: function (duration) {
+            let timer = duration,
+                minutes,
+                seconds
+            minutes = parseInt(timer / 60, 10)
+            seconds = parseInt(timer % 60, 10)
+
+            minutes = minutes < 10 ? "0" + minutes : minutes
+            seconds = seconds < 10 ? "0" + seconds : seconds
+
+            return minutes + ":" + seconds
         },
+        changePlayer: function (playerId) {
+            if (playerId !== this.activePlayerId && this.running) return
+
+            if (!this.running) {
+                this.activePlayerId = playerId
+            } else {
+                this.activePlayerId = playerId === 1 ? 2 : 1
+            }
+            this.start()
+            // if (this.running && !this.gameOver) this.updateCounter(this.players[this.activePlayerId - 1])
+        },
+        start: function () {
+            if (this.gameOver) {
+                this.players = this.players.map(player => ({
+                    ...player,
+                    left: player.duration,
+                }))
+                this.players.forEach(player => (player.text = this.parseTime(player.duration)))
+            }
+            this.updateCounter(this.players[this.activePlayerId - 1])
+            this.running = true
+        },
+    },
+    mounted() {
+        this.players.forEach(player => {
+            player.text = this.parseTime(player.left)
+        })
     },
     data() {
         return {
-            started: false,
+            interval: null,
             running: false,
-            text: "hello",
-            activePlayer: 1,
+            gameOver: false,
             players: [
-                { name: "Detlef", id: 1 },
-                { name: "Joshi", id: 2 },
+                { name: "Moritz", id: 1, duration: 100, left: 100 },
+                { name: "Joshi", id: 2, duration: 5, left: 5 },
             ],
+            activePlayerId: 0,
         }
     },
 }
