@@ -1,14 +1,24 @@
 <template>
-    <div class="home">
+    <div class="home flex justify-center flex-col items-center h-screen">
+        <input type="text" style="background: black; color: white" />
         <div
             :key="player.id"
             v-for="player in players"
             @click="changePlayer(player.id)"
+            @dblclick="reset()"
             :class="['player-' + player.id.toString(), activePlayerId === player.id && 'active']"
         >
-            <Clock :name="player.name" :text="player.text" />
+            <Clock
+                :name="player.name"
+                :playerId="player.id"
+                @user-name="changeUsername"
+                :reverse="player.id === 2"
+                :text="player.text"
+                :started="started"
+            />
         </div>
         <br />
+        <button class="bg-blue-600 text-white px-5 rounded-sm text-lg" v-if="!running" @click="start()">Start</button>
     </div>
 </template>
 
@@ -22,6 +32,9 @@ export default {
         Clock,
     },
     methods: {
+        changeUsername: function (user) {
+            console.log("User", user)
+        },
         updateCounter: function (player) {
             let timer = player.left,
                 minutes,
@@ -42,6 +55,7 @@ export default {
                     player.text = "Game Over"
                     this.gameOver = true
                     this.running = false
+                    this.started = false
                 }
             }
             foo()
@@ -69,7 +83,7 @@ export default {
             } else {
                 this.activePlayerId = playerId === 1 ? 2 : 1
             }
-            this.start()
+            if (this.started) this.start()
             // if (this.running && !this.gameOver) this.updateCounter(this.players[this.activePlayerId - 1])
         },
         start: function () {
@@ -82,30 +96,50 @@ export default {
             }
             this.updateCounter(this.players[this.activePlayerId - 1])
             this.running = true
+            this.started = true
+        },
+        reset: function () {
+            this.players = this.players.map(player => ({
+                ...player,
+                left: player.duration,
+            }))
+            this.players.forEach(player => (player.text = this.parseTime(player.duration)))
+            this.running = false
+            this.started = false
+            this.gameOver = false
         },
     },
     mounted() {
-        this.players.forEach(player => {
-            player.text = this.parseTime(player.left)
-        })
+        this.reset()
     },
     data() {
         return {
             interval: null,
             running: false,
             gameOver: false,
+            started: false,
             players: [
-                { name: "Moritz", id: 1, duration: 100, left: 100 },
-                { name: "Joshi", id: 2, duration: 5, left: 5 },
+                { name: "Player 1", id: 1, duration: 100, left: 100 },
+                { name: "Player 2", id: 2, duration: 100, left: 100 },
             ],
-            activePlayerId: 0,
+            activePlayerId: 1,
         }
     },
 }
 </script>
 
 <style>
+* {
+    user-select: none;
+}
+#home {
+}
 .active {
-    color: green;
+    color: rgb(37, 99, 235);
+}
+input {
+    text-align: center;
+    height: 45px;
+    font-family: Arial !important;
 }
 </style>
