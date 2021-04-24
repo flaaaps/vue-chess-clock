@@ -1,5 +1,6 @@
 <template>
     <div class="home flex justify-center flex-col items-center h-screen">
+        <TimerConfig :show="showConfig" @close-modal="showConfig = false" />
         <div
             :key="player.id"
             v-for="player in players"
@@ -17,6 +18,7 @@
             />
         </div>
         <br />
+        <font-awesome-icon icon="stopwatch" class="mb-3 text-3xl" @click="showConfig = !showConfig" />
         <button class="bg-blue-600 text-white px-5 rounded-sm text-lg" v-if="!running" @click="start()">Start</button>
     </div>
 </template>
@@ -24,11 +26,13 @@
 <script>
 // @ is an alias to /src
 import Clock from "@/components/Clock.vue"
+import TimerConfig from "@/components/TimerConfig.vue"
 
 export default {
     name: "Home",
     components: {
         Clock,
+        TimerConfig,
     },
     methods: {
         changeUsername: function (user) {
@@ -117,6 +121,7 @@ export default {
             running: false,
             gameOver: false,
             started: false,
+            showConfig: false,
             players: [
                 { name: "Player 1", id: 1, duration: 100, left: 100 },
                 { name: "Player 2", id: 2, duration: 100, left: 100 },
