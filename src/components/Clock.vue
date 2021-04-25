@@ -1,5 +1,5 @@
 <template>
-    <div :class="['flex', 'flex-col', reverse ? 'flex-col-reverse mt-6' : 'flex-col']">
+    <div :class="['flex flex-col items-center', reverse ? 'flex-col-reverse mt-6' : 'flex-col']">
         <div class="my-3 flex items-center">
             <input class="bg-gray-200 border-r-2 border-white" :id="playerId" type="text" v-model="displayName" />
             <div class="mx-auto bg-gray-200" style="height: 45px" v-if="!started">
