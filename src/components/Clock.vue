@@ -28,6 +28,11 @@ export default {
             displayName: this.name,
         }
     },
+    watch: {
+        displayName: function (newVal) {
+            this.$emit("user-name", { name: newVal, id: this.playerId })
+        },
+    },
 }
 </script>
 
