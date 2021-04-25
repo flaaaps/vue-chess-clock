@@ -1,6 +1,6 @@
 <template>
     <div class="home flex justify-center flex-col items-center h-screen">
-        <TimerConfig :show="showConfig" @close-modal="showConfig = false" />
+        <TimerConfig :show="showConfig" @close-modal="showConfig = false" :players="players" />
         <div
             :key="player.id"
             v-for="player in players"
@@ -35,8 +35,8 @@ export default {
         TimerConfig,
     },
     methods: {
-        changeUsername: function (user) {
-            console.log("User", user)
+        changeUsername: function (userObj) {
+            this.players.map(player => (player.id === userObj.id ? (player.name = userObj.name) : null))
         },
         updateCounter: function (player) {
             let timer = player.left,
