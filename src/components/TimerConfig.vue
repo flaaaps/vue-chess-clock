@@ -6,7 +6,10 @@
             <nav class="text-right">
                 <button class="mt-2" @click="$emit('close-modal')"><font-awesome-icon icon="times" /></button>
             </nav>
-            <h1 class="mt-6 text-3xl font-bold">Configure</h1>
+            <h1 class="my-3 text-3xl font-bold">Configure</h1>
+            <div v-for="(player, index) in players" :key="index" class="text-left">
+                <h2 class="font-medium text-xl">{{ player.name }}</h2>
+            </div>
         </div>
     </div>
 </template>
@@ -15,6 +18,7 @@ export default {
     name: "TimerConfig",
     props: {
         show: Boolean,
+        players: [Object],
     },
 }
 </script>
