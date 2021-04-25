@@ -1,6 +1,6 @@
 <template>
     <div class="home flex justify-center flex-col items-center h-screen">
-        <TimerConfig :show="showConfig" @close-modal="showConfig = false" :players="players" />
+        <TimerConfig v-if="!started" :show="showConfig" @close-modal="showConfig = false" :players="players" />
         <div
             :key="player.id"
             v-for="player in players"
@@ -18,7 +18,7 @@
             />
         </div>
         <br />
-        <font-awesome-icon icon="stopwatch" class="mb-3 text-3xl" @click="showConfig = !showConfig" />
+        <font-awesome-icon icon="stopwatch" v-if="!started" class="mb-3 text-3xl" @click="showConfig = !showConfig" />
         <button class="bg-blue-600 text-white px-5 rounded-sm text-lg" v-if="!running" @click="start()">Start</button>
     </div>
 </template>
@@ -39,19 +39,13 @@ export default {
             this.players.map(player => (player.id === userObj.id ? (player.name = userObj.name) : null))
         },
         updateCounter: function (player) {
-            let timer = player.left,
-                minutes,
-                seconds
+            let timer = player.left
+            // minutes,
+            // seconds
             if (this.interval) clearInterval(this.interval)
             console.log(timer)
             const foo = () => {
-                minutes = parseInt(timer / 60, 10)
-                seconds = parseInt(timer % 60, 10)
-
-                minutes = minutes < 10 ? "0" + minutes : minutes
-                seconds = seconds < 10 ? "0" + seconds : seconds
-
-                player.text = minutes + ":" + seconds
+                player.text = this.parseTime(timer)
                 player.left = --timer
 
                 if (timer < 0) {
@@ -69,14 +63,17 @@ export default {
         parseTime: function (duration) {
             let timer = duration,
                 minutes,
-                seconds
-            minutes = parseInt(timer / 60, 10)
+                seconds,
+                hours
+
+            hours = parseInt(timer / 3600, 10)
+            minutes = parseInt((timer % 3600) / 60, 10)
             seconds = parseInt(timer % 60, 10)
 
+            hours = hours < 10 ? "0" + hours : hours
             minutes = minutes < 10 ? "0" + minutes : minutes
             seconds = seconds < 10 ? "0" + seconds : seconds
-
-            return minutes + ":" + seconds
+            return hours + ":" + minutes + ":" + seconds
         },
         changePlayer: function (playerId) {
             if (playerId !== this.activePlayerId && this.running) return
@@ -122,8 +119,11 @@ export default {
             gameOver: false,
             started: false,
             showConfig: false,
+            config: {
+                alwaysShowHours: true,
+            },
             players: [
-                { name: "Player 1", id: 1, duration: 100, left: 100 },
+                { name: "Player 1", id: 1, duration: 32410, left: 100 },
                 { name: "Player 2", id: 2, duration: 100, left: 100 },
             ],
             activePlayerId: 1,
