@@ -1,5 +1,5 @@
 <template>
-    <div :class="['flex', 'flex-col', reverse ? 'flex-col-reverse mt-6' : 'flex-col']">
+    <div :class="['flex flex-col items-center', reverse ? 'flex-col-reverse mt-6' : 'flex-col']">
         <div class="my-3 flex items-center">
             <input
                 class="bg-gray-200 border-r-2 border-white"
@@ -33,6 +33,11 @@ export default {
             disabled: true,
             displayName: this.name,
         }
+    },
+    watch: {
+        displayName: function (newVal) {
+            this.$emit("user-name", { name: newVal, id: this.playerId })
+        },
     },
 }
 </script>
